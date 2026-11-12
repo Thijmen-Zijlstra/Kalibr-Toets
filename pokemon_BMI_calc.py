@@ -5,8 +5,6 @@ import time
 API_ENDPOINT = "https://pokeapi.co/api/v2/pokemon/"
 POKETYPES = ["normal", "fire", "water", "electric", "grass", "ice", "fighting", "poison", "ground", "flying", "psychic", "bug", "rock", "ghost", "dragon", "dark", "steel", "fairy", "stellar"]
 
-# TODO make an API-endpoint creator, so you can input which pokémon you want and you get the stats back.
-# TODO get data from poke API; make a selection of what you want. I want to compare different pokémon together.
 # TODO reformat the API-data to a DataFrame
 # TODO filter the data based on the inputted order and type
 # TODO enrich data by calculating the BMI and adding that as another stat to the dataframe.
@@ -15,7 +13,7 @@ POKETYPES = ["normal", "fire", "water", "electric", "grass", "ice", "fighting", 
 
 
 def get_pokerange():
-    chosen_range = input("Which range of pokedex entries do you want to search for? Separate the start of the range and end of the range by a space, like '1 2'.\n")
+    chosen_range = input("Which range of pokedex entries do you want to search for (1-1025)? Don't make the range too big, as it takes a while to fetch the data from the API.\nSeparate the start of the range and end of the range by a space, like '1 2'.\n")
 
     try:
         range_list = chosen_range.split(" ")
@@ -26,7 +24,18 @@ def get_pokerange():
     else:
         pokerange = [int(num) for num in range_list]
 
-        return pokerange
+    pokerange.sort()
+    pokerange[1] += 1
+    print(pokerange)
+
+    if pokerange[0] < 1:
+        print(f"{pokerange[0]} is below the legal threshold of 1. Please input a different starting value.")
+        get_pokerange()
+    if pokerange[1] > 1025:
+        print(f"{pokerange[1]} is above the legal threshold of 1025. Please input a lower number.")
+        get_pokerange()
+
+    return pokerange
 
 
 def get_poketype():
@@ -37,9 +46,27 @@ def get_poketype():
         return chosen_type
 
 
+def create_api_endpoint(poke_id):
+    url = API_ENDPOINT + f"{poke_id}/"
+    return url
+
+
+def get_api_data(pokerange):
+    raw_data = []
+    for id in range(pokerange[0],pokerange[1]):
+        url = create_api_endpoint(id)
+        response = requests.get(url=url)
+        response.raise_for_status()
+        raw_data.append(response.json())
+        time.sleep(1)
+    return raw_data
+
+
 def main():
     chosen_range = get_pokerange()
     chosen_type = get_poketype()
+    raw_data = get_api_data(chosen_range)
+    print(raw_data)
 
 
 main()
