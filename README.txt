@@ -1,0 +1,15 @@
+Pokémon BMI calculator
+
+The goal of this Python program is the following:
+1. Based on an API (pokeapi.co), pokédata is fetched.
+2. The Python program then filters the data based on order and type of pokémon. Which order range and type is inputted by the user.
+3. The data is then enriched by calculating the BMI of the filtered pokémon (based on height (dm) and weight (kg) stats)
+4. The data is then saved as both a .JSON file and a .CSV file in the same directory.
+
+For the program to work, you need Python v. 3.15.2
+Necessery packages: requests, pandas
+
+Run the program by typing "$ python pokemon_BMI_calc.py" in the command line. Make sure your working directory is in the same directory as the pokemon_BMI_calc.py file.
+The program automatically asks for user input if needed, like the pokedex range and pokemon type.
+
+Run the tests in test_main.py by typing "$ python test_pokemon_BMI_calc.py" in the command line. This should automatically test the main caluclator functions.
