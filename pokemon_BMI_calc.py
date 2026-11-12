@@ -5,12 +5,6 @@ import time
 API_ENDPOINT = "https://pokeapi.co/api/v2/pokemon/"
 
 
-# TODO reformat the API-data to a DataFrame
-# TODO enrich data by calculating the BMI and adding that as another stat to the dataframe.
-# TODO save the dataframe as JSON
-# TODO save the dataframe as CSV
-
-
 def get_pokerange():
     chosen_range = input("Which range of pokedex entries do you want to search for (1-1025)? A maximum range of 100 has been set, as it would otherwise take too long to fetch the data from the API.\nSeparate the start of the range and end of the range by a space, like '1 2'.\n")
 
@@ -50,7 +44,7 @@ def create_api_endpoint(poke_id):
 
 
 def get_api_data(pokerange):
-    print("Fetching data from the API.")
+    print("\n -------------- Fetching data from the API. -------------- \n")
     raw_data = []
     for id in range(pokerange[0],pokerange[1]):
         url = create_api_endpoint(id)
@@ -71,16 +65,17 @@ def get_api_data(pokerange):
 
 
 def filter_data(raw_data):
+    print("\n -------------- Filtering data. -------------- \n")
     # Filter the raw API-data with the presepecified filtercriteria.
     filtered_data = []
     for raw_datum in raw_data:
         filtered_datum = {}
         filtered_datum["id"] = raw_datum["id"]
         filtered_datum["name"] = raw_datum["name"]
-        filtered_datum["height"] = raw_datum["height"]
-        filtered_datum["weight"] = raw_datum["weight"]
         filtered_datum["order"] = raw_datum["order"]
         filtered_datum["types"] = [type["type"]["name"] for type in raw_datum["types"]]
+        filtered_datum["height"] = raw_datum["height"]
+        filtered_datum["weight"] = raw_datum["weight"]
         filtered_data.append(filtered_datum)
     data_df = pd.DataFrame(filtered_data)
     return data_df
@@ -92,8 +87,24 @@ def calculate_bmi(height, weight):
 
 
 def enrich_data(data):
+    # Adds a column named "bmi" to the dataframe
     data["bmi"] = calculate_bmi(data.height,data.weight)
     return data
+
+
+def create_savefilename(pokerange):
+    # creates a savefilename based on the range of pokemon the user specified. Format: "pokeID_start-range_to_end-range_bmi"
+    return f"pokeID_{pokerange[0]}_to_{pokerange[1] - 1}_bmi"
+
+
+def save_to_csv(dataframe, savefilename):
+    dataframe.to_csv(savefilename + ".csv", index=0)
+    return
+
+
+def save_to_json(dataframe, savefilename):
+    dataframe.to_json(savefilename + ".json")
+    return
 
 
 def main():
@@ -101,7 +112,10 @@ def main():
     raw_pokemon = get_api_data(chosen_range)
     filtered_pokemon = filter_data(raw_pokemon)
     enriched_pokemon = enrich_data(filtered_pokemon)
-    print(enriched_pokemon)
+    savefilename = create_savefilename(chosen_range)
+    save_to_csv(enriched_pokemon,savefilename)
+    save_to_json(enriched_pokemon,savefilename)
+    return
 
 
 main()
