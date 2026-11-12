@@ -3,10 +3,8 @@ import pandas as pd
 import time
 
 API_ENDPOINT = "https://pokeapi.co/api/v2/pokemon/"
-POKETYPES = ["normal", "fire", "water", "electric", "grass", "ice", "fighting", "poison", "ground", "flying", "psychic", "bug", "rock", "ghost", "dragon", "dark", "steel", "fairy", "stellar"]
 
 # TODO reformat the API-data to a DataFrame
-# TODO filter the API data for height, weight, id, name, types
 # TODO enrich data by calculating the BMI and adding that as another stat to the dataframe.
 # TODO save the dataframe as JSON
 # TODO save the dataframe as CSV
@@ -43,15 +41,6 @@ def get_pokerange():
         get_pokerange()
 
     return pokerange
-
-
-def get_poketype():
-    chosen_type = input(f"Which type of pokemon do you want filtered? These are the legal types: {POKETYPES}\n").lower()
-    # Check whether the user has inputted a legal poketype.
-    if chosen_type not in POKETYPES:
-        get_poketype()
-    else:
-        return chosen_type
 
 
 def create_api_endpoint(poke_id):
@@ -95,7 +84,6 @@ def filter_data(raw_data):
 
 def main():
     chosen_range = get_pokerange()
-    chosen_type = get_poketype()
     raw_data = get_api_data(chosen_range)
     filtered_data = filter_data(raw_data)
     print(filtered_data)
