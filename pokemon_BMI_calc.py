@@ -83,7 +83,13 @@ def filter_data(raw_data):
 
 def calculate_bmi(height, weight):
     # pokemon weight is in kg, height in dm, so we divide by 10 to get the unit in m
-    return round(weight/(height/10)**2, 2)
+    try:
+        bmi = round(weight/(height/10)**2, 2)
+    except ZeroDivisionError:
+        print(f"Could not calculate the bmi of {height} and {weight}. Dividing by 0 is not allowed.")
+        return None
+    else:
+        return bmi
 
 
 def enrich_data(data):
