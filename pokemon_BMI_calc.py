@@ -4,6 +4,7 @@ import time
 
 API_ENDPOINT = "https://pokeapi.co/api/v2/pokemon/"
 
+
 # TODO reformat the API-data to a DataFrame
 # TODO enrich data by calculating the BMI and adding that as another stat to the dataframe.
 # TODO save the dataframe as JSON
@@ -49,6 +50,7 @@ def create_api_endpoint(poke_id):
 
 
 def get_api_data(pokerange):
+    print("Fetching data from the API.")
     raw_data = []
     for id in range(pokerange[0],pokerange[1]):
         url = create_api_endpoint(id)
@@ -69,24 +71,37 @@ def get_api_data(pokerange):
 
 
 def filter_data(raw_data):
+    # Filter the raw API-data with the presepecified filtercriteria.
     filtered_data = []
-    for raw_pokemon_data in raw_data:
-        pokemon = {}
-        pokemon["id"] = raw_pokemon_data["id"]
-        pokemon["name"] = raw_pokemon_data["name"]
-        pokemon["height"] = raw_pokemon_data["height"]
-        pokemon["weight"] = raw_pokemon_data["weight"]
-        pokemon["order"] = raw_pokemon_data["order"]
-        pokemon["types"] = [type["type"]["name"] for type in raw_pokemon_data["types"]]
-        filtered_data.append(pokemon)
-    return filtered_data
+    for raw_datum in raw_data:
+        filtered_datum = {}
+        filtered_datum["id"] = raw_datum["id"]
+        filtered_datum["name"] = raw_datum["name"]
+        filtered_datum["height"] = raw_datum["height"]
+        filtered_datum["weight"] = raw_datum["weight"]
+        filtered_datum["order"] = raw_datum["order"]
+        filtered_datum["types"] = [type["type"]["name"] for type in raw_datum["types"]]
+        filtered_data.append(filtered_datum)
+    data_df = pd.DataFrame(filtered_data)
+    return data_df
+
+
+def calculate_bmi(height, weight):
+    # pokemon weight is in kg, height in dm, so we divide by 10 to get the unit in m
+    return round(weight/(height/10)**2, 2)
+
+
+def enrich_data(data):
+    data["bmi"] = calculate_bmi(data.height,data.weight)
+    return data
 
 
 def main():
     chosen_range = get_pokerange()
-    raw_data = get_api_data(chosen_range)
-    filtered_data = filter_data(raw_data)
-    print(filtered_data)
+    raw_pokemon = get_api_data(chosen_range)
+    filtered_pokemon = filter_data(raw_pokemon)
+    enriched_pokemon = enrich_data(filtered_pokemon)
+    print(enriched_pokemon)
 
 
 main()
